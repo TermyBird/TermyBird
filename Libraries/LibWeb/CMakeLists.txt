@@ -785,49 +785,6 @@ set(SOURCES
     Page/EventHandler.cpp
     Page/InputEvent.cpp
     Page/Page.cpp
-    Painting/AudioPaintable.cpp
-    Painting/BackgroundPainting.cpp
-    Painting/BackingStoreManager.cpp
-    Painting/BorderPainting.cpp
-    Painting/BorderRadiiData.cpp
-    Painting/BorderRadiusCornerClipper.cpp
-    Painting/BordersData.cpp
-    Painting/BoxModelMetrics.cpp
-    Painting/CanvasPaintable.cpp
-    Painting/CheckBoxPaintable.cpp
-    Painting/ClipFrame.cpp
-    Painting/DisplayList.cpp
-    Painting/DisplayListCommand.cpp
-    Painting/DisplayListPlayerSkia.cpp
-    Painting/DisplayListRecorder.cpp
-    Painting/DisplayListRecordingContext.cpp
-    Painting/FieldSetPaintable.cpp
-    Painting/GradientPainting.cpp
-    Painting/ImagePaintable.cpp
-    Painting/LabelablePaintable.cpp
-    Painting/MarkerPaintable.cpp
-    Painting/MediaPaintable.cpp
-    Painting/NavigableContainerViewportPaintable.cpp
-    Painting/Paintable.cpp
-    Painting/PaintableBox.cpp
-    Painting/PaintableFragment.cpp
-    Painting/RadioButtonPaintable.cpp
-    Painting/ScrollFrame.cpp
-    Painting/ScrollState.cpp
-    Painting/ShadowPainting.cpp
-    Painting/StackingContext.cpp
-    Painting/SVGClipPaintable.cpp
-    Painting/SVGForeignObjectPaintable.cpp
-    Painting/SVGGraphicsPaintable.cpp
-    Painting/SVGMaskable.cpp
-    Painting/SVGMaskPaintable.cpp
-    Painting/SVGPaintable.cpp
-    Painting/SVGPathPaintable.cpp
-    Painting/SVGSVGPaintable.cpp
-    Painting/TableBordersPainting.cpp
-    Painting/TextPaintable.cpp
-    Painting/VideoPaintable.cpp
-    Painting/ViewportPaintable.cpp
     PerformanceTimeline/EntryTypes.cpp
     PerformanceTimeline/EventNames.cpp
     PerformanceTimeline/PerformanceEntry.cpp
@@ -1102,6 +1059,66 @@ set(SOURCES
     XPath/XPathResult.cpp
 )
 
+set(LIBWEB_DEFAULT_PAINTING_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Painting")
+get_filename_component(LIBWEB_DEFAULT_PAINTING_DIR "${LIBWEB_DEFAULT_PAINTING_DIR}" ABSOLUTE)
+set(LIBWEB_PAINTING_DIR "${LIBWEB_DEFAULT_PAINTING_DIR}")
+if (DEFINED LADYBIRD_PAINTING_OVERRIDE_DIR AND NOT LADYBIRD_PAINTING_OVERRIDE_DIR STREQUAL "")
+    set(LIBWEB_PAINTING_DIR "${LADYBIRD_PAINTING_OVERRIDE_DIR}")
+endif()
+get_filename_component(LIBWEB_PAINTING_DIR "${LIBWEB_PAINTING_DIR}" ABSOLUTE)
+
+set(LIBWEB_PAINTING_SOURCES
+    AudioPaintable.cpp
+    BackgroundPainting.cpp
+    BackingStoreManager.cpp
+    BorderPainting.cpp
+    BorderRadiiData.cpp
+    BorderRadiusCornerClipper.cpp
+    BordersData.cpp
+    BoxModelMetrics.cpp
+    CanvasPaintable.cpp
+    CheckBoxPaintable.cpp
+    ClipFrame.cpp
+    DisplayList.cpp
+    DisplayListCommand.cpp
+    DisplayListPlayerSkia.cpp
+    DisplayListRecorder.cpp
+    DisplayListRecordingContext.cpp
+    FieldSetPaintable.cpp
+    GradientPainting.cpp
+    ImagePaintable.cpp
+    LabelablePaintable.cpp
+    MarkerPaintable.cpp
+    MediaPaintable.cpp
+    NavigableContainerViewportPaintable.cpp
+    Paintable.cpp
+    PaintableBox.cpp
+    PaintableFragment.cpp
+    RadioButtonPaintable.cpp
+    ScrollFrame.cpp
+    ScrollState.cpp
+    ShadowPainting.cpp
+    StackingContext.cpp
+    SVGClipPaintable.cpp
+    SVGForeignObjectPaintable.cpp
+    SVGGraphicsPaintable.cpp
+    SVGMaskable.cpp
+    SVGMaskPaintable.cpp
+    SVGPaintable.cpp
+    SVGPathPaintable.cpp
+    SVGSVGPaintable.cpp
+    TableBordersPainting.cpp
+    TextPaintable.cpp
+    VideoPaintable.cpp
+    ViewportPaintable.cpp
+)
+
+foreach(painting_source IN LISTS LIBWEB_PAINTING_SOURCES)
+    list(APPEND SOURCES "${LIBWEB_PAINTING_DIR}/${painting_source}")
+endforeach()
+
+get_filename_component(LIBWEB_PAINTING_INCLUDE_DIR "${LIBWEB_PAINTING_DIR}/.." ABSOLUTE)
+
 compile_ipc(Worker/WebWorkerClient.ipc Worker/WebWorkerClientEndpoint.h)
 compile_ipc(Worker/WebWorkerServer.ipc Worker/WebWorkerServerEndpoint.h)
 
@@ -1152,6 +1169,9 @@ target_link_libraries(LibWeb PRIVATE LibCore LibCompress LibCrypto LibJS LibHTTP
 
 # FIXME: https://github.com/microsoft/vcpkg/issues/42324
 target_include_directories(LibWeb PRIVATE ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include)
+if (NOT LIBWEB_PAINTING_DIR STREQUAL LIBWEB_DEFAULT_PAINTING_DIR)
+    target_include_directories(LibWeb BEFORE PRIVATE "${LIBWEB_PAINTING_INCLUDE_DIR}")
+endif()
 
 generate_js_bindings(LibWeb)
 

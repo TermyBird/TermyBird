@@ -34,6 +34,12 @@ project(ladybird
         HOMEPAGE_URL "https://ladybird.org"
 )
 
+option(ENABLE_TERMYBIRD "Build the TermyBird Qt frontend" ON)
+
+if (ENABLE_TERMYBIRD AND NOT DEFINED LADYBIRD_PAINTING_OVERRIDE_DIR)
+    set(LADYBIRD_PAINTING_OVERRIDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/TermyBird/Libraries/LibWeb/Painting")
+endif()
+
 if (ANDROID OR IOS)
     set(BUILD_SHARED_LIBS OFF)
 endif()
@@ -77,6 +83,9 @@ include(CTest) # for BUILD_TESTING option, default ON
 if (ENABLE_GUI_TARGETS)
     add_subdirectory(Services)
     add_subdirectory(UI)
+    if (ENABLE_TERMYBIRD)
+        add_subdirectory(TermyBird)
+    endif()
 endif()
 
 add_custom_target(lint-shell-scripts
